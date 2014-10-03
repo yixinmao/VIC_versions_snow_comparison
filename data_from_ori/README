@@ -1,0 +1,17 @@
+vic_params.soil.precal.bpa.20140924.txt
+	soil parameter file (copied from: /raid2/jhamman/projects/BPA/data/inputdata/VIC/bpa_vic_params/vic_params.soil.precal.bpa.20140924.txt)
+	The last column should be deleted when using (it is for glacier model)
+
+vic_params.veg.precal.bpa.20140924.txt
+	veg parameter file (copied from: /raid2/jhamman/projects/BPA/data/inputdata/VIC/bpa_vic_params/vic_params.soil.precal.bpa.20140924.txt)
+
+veglib.LDAS
+	veg library (copied from: /raid9/oriana/bpa/autocalib/vic_params/veglib.LDAS)
+
+input.template
+	global file template (/home/oriana/scripts/autocalib/SCE_CAL/input.template)
+
+full_data_48.59375_-120.21875
+	forcing from Oriana for this one grid cell
+	1915-2011, 1 hour time step
+	[PREC, mm/timestep] [AIR_TEMP, degC] [SHORTWAVE, W/m2] [LONGWAVE, W/m2] [DENSITY, kg/m3] [PRESSURE, kPa] [VP, kPa] [WIND, m/s]

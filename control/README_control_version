@@ -1,0 +1,6 @@
+control.20140929.src
+	the first model running version
+	Water balance (NODES=1)
+
+control.20140930.src
+	Energy balance (NODES=3)
