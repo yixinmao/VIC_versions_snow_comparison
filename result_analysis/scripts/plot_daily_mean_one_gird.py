@@ -25,7 +25,7 @@ vic_output_path.append('/raid2/ymao/VIC_versions_snow_comparison/vic_output/2014
 vic_output_path.append('/raid2/ymao/VIC_versions_snow_comparison/vic_output/20140930/veg_%s/v4.1.2.m/fluxes_48.59375_-120.21875' %args.veg)
 
 # output plot file
-result_dir = '/raid2/ymao/VIC_versions_snow_comparison/result_analysis/plot/20140930/energy_balance'
+result_dir = '/raid2/ymao/VIC_versions_snow_comparison/result_analysis/plot/test_output'
 
 # version name
 version = []
@@ -38,6 +38,7 @@ version.append("v4.1.2.m")
 balance = "Energy balance"
 
 # time
+#skiprows = 201624
 skiprows = 0 # 201624
 dtime = 1 # time step, hour
 sim_start_time = dt.datetime(year=1987, month=1, day=1, hour=0) # simulation start time
@@ -80,14 +81,13 @@ for i in range(nversion):
 
 
 ################# plot daily average over all years (skip leap years) #################
-# create a list of 365 days
+# create a list of 365 days (starting from Oct 1)
 dates_year_example = []
 dates_year = {}
 for i in range(365):
-	date = dt.datetime(year=2011, month=1, day=1) + dt.timedelta(days=i)
+	date = dt.datetime(year=2010, month=10, day=1) + dt.timedelta(days=i)
 	dates_year[date.month*100 + date.day] = i
 	dates_year_example.append(date)
-print len(dates_year)
 
 for i in range(nvar):
 	print "Plotting variable %d..." %(i+1)
@@ -114,9 +114,7 @@ for i in range(nvar):
 	fig = plt.figure(figsize=(16,8))
 	ax = plt.axes()
 	color = ['m', 'r', 'g', 'b']
-#	dates_year_example = dates_year_example[274:] + dates_year_example[:274]
 	for j in range(nversion):
-#		var_avg[j] = np.concatenate([var_avg[j,274:], var_avg[j,:274]])
 		ax.plot_date(dates_year_example, var_avg[j], color[j], label=version[j])
 #	months = MonthLocator([10,11,12,1,2,3,4,5,6,7,8,9])
 #	ax.xaxis.set_major_locator(months)
@@ -134,12 +132,8 @@ for i in range(nvar):
 	fig = plt.figure(figsize=(16,8))
 	ax = plt.axes()
 	color = ['m', 'r', 'g', 'b']
-#	dates_year_example = dates_year_example[274:] + dates_year_example[:274]
 	for j in range(nversion-1):
-#		var_avg[j] = np.concatenate([var_avg[j,274:], var_avg[j,:274]])
 		ax.plot_date(dates_year_example, var_avg[j+1]-var_avg[j], color[j+1], label='%s-%s' %(version[j+1], version[j]))
-#	months = MonthLocator([10,11,12,1,2,3,4,5,6,7,8,9])
-#	ax.xaxis.set_major_locator(months)
 	ax.xaxis.set_major_formatter(DateFormatter("%b"))
 	for tick in ax.xaxis.get_major_ticks():
 		tick.label.set_fontsize(16)
