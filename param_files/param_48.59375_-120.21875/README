@@ -1,0 +1,17 @@
+soil_param_48.59375_-120.21875
+	soil parameter for one grid cell (from ori's soil file 'vic_params.soil.precal.bpa.20140924.txt')
+	the last column is deleted
+
+veg_param_48.59375_-120.21875_veg[1-11]
+	veg param files for one grid cell
+	one type of veg for the whole grid cell
+	one param file for each veg type
+	veg0 for bare soil
+
+veglib.LDAS
+	veg libary from Oriana
+
+veg_root_zone_list
+	A list of root zone depth and fraction for each veg type (from Oriana's data)
+
+
