@@ -14,25 +14,27 @@ parser.add_argument("--veg", help="Veg type")
 args = parser.parse_args()
 
 ########################### user defined #############################
-nversion = 4
+nopt = 4  # number of options of the parameter
+version_name = '4.1.2.m'
 
 # vic output files
 # [year] [month] [day] [hour] [precip (mm/ts)] [total ET (mm/ts)] [surface runoff (mm/ts)] [baseflow (mm/ts)] [air temperature (degC)] [soil liquid content 1 (mm)] [soil liquid content 2 (mm)] [soil liquid content 3 (mm)] [total swe (mm)] [canapy swe (mm)] [snow melt (mm/ts)] [snow fall (mm/ts)]
 vic_output_path = []
-vic_output_path.append('/raid2/ymao/VIC_versions_snow_comparison/vic_output/20141003_EnergyBalance/veg_%s/v4.0.6/fluxes_48.59375_-120.21875' %args.veg)
-vic_output_path.append('/raid2/ymao/VIC_versions_snow_comparison/vic_output/20141003_EnergyBalance/veg_%s/v4.1.0.r4h/fluxes_48.59375_-120.21875' %args.veg)
-vic_output_path.append('/raid2/ymao/VIC_versions_snow_comparison/vic_output/20141003_EnergyBalance/veg_%s/v4.1.1/fluxes_48.59375_-120.21875' %args.veg)
-vic_output_path.append('/raid2/ymao/VIC_versions_snow_comparison/vic_output/20141003_EnergyBalance/veg_%s/v4.1.2.m/fluxes_48.59375_-120.21875' %args.veg)
+vic_output_path.append('/raid2/ymao/VIC_versions_snow_comparison/vic_output/20141003_EB_AR_1/veg_%s/v4.1.2.m/fluxes_48.59375_-120.21875' %args.veg)
+vic_output_path.append('/raid2/ymao/VIC_versions_snow_comparison/vic_output/20141003_EB_AR_2/veg_%s/v4.1.2.m/fluxes_48.59375_-120.21875' %args.veg)
+vic_output_path.append('/raid2/ymao/VIC_versions_snow_comparison/vic_output/20141003_EB_AR_3/veg_%s/v4.1.2.m/fluxes_48.59375_-120.21875' %args.veg)
+vic_output_path.append('/raid2/ymao/VIC_versions_snow_comparison/vic_output/20141003_EB_AR_4/veg_%s/v4.1.2.m/fluxes_48.59375_-120.21875' %args.veg)
 
 # output plot file
-result_dir = '/raid2/ymao/VIC_versions_snow_comparison/result_analysis/plot/20141003_EnergyBalance'
+result_dir = '/raid2/ymao/VIC_versions_snow_comparison/result_analysis/plot/20141003_EB_AR'
 
-# version name
-version = []
-version.append("v4.0.6")
-version.append("v4.1.0.r4h")
-version.append("v4.1.1")
-version.append("v4.1.2.m")
+# parameter option names
+param_name = 'AERO_RESIST_CANSNOW'
+opt = []
+opt.append("AR_406")
+opt.append("AR_406_LS")
+opt.append("AR_406_FULL")
+opt.append("AR_410")
 
 # model setting
 balance = "Energy balance"
@@ -58,7 +60,7 @@ for i in range(ntime):
 
 # variables
 var_list = ['Precipitation', 'ET', 'Surface_runoff', 'Baseflow', 'Air_temperature', 'Soil_moisture_1', 'Soil_moisture_2', 'Soil_moisture_3', 'SWE', 'Canopy_snow', 'Snow_melt', 'Snow_fall', 'Canopy_evap', 'Canopy_snow_sub', 'Snow_sub', 'Snow_surf_sub']
-var_dict = {'Precipitation': [[4,4,4,4], 'mm/hr'], # column in each version (index starting from 0)
+var_dict = {'Precipitation': [[4,4,4,4], 'mm/hr'], # column in each option, should be all the same (index starting from 0)
          'ET': [[5,5,5,5], 'mm/hr'],
          'Surface_runoff': [[6,6,6,6], 'mm/hr'],
          'Baseflow': [[7,7,7,7], 'mm/hr'],
@@ -73,13 +75,13 @@ var_dict = {'Precipitation': [[4,4,4,4], 'mm/hr'], # column in each version (ind
          'Canopy_evap': [[16,16,16,16], 'mm/hr'],
          'Canopy_snow_sub': [[17,17,17,17], 'mm/hr'],
          'Snow_sub': [[18,18,18,18], 'mm/hr'],
-         'Snow_surf_sub': [[-1,19,19,19], 'mm/hr'], # -1 for no data for this var in this version
+         'Snow_surf_sub': [[19,19,19,19], 'mm/hr'], # -1 for no data for this var in this version
 } 
 nvar = len(var_list)
 
 ########################### load data #############################
 vic_output = []
-for i in range(nversion):
+for i in range(nopt):
 	print "Loading data %d..." %(i+1)
 	vic_output.append(np.loadtxt(vic_output_path[i], skiprows=skiprows))  
 
@@ -102,10 +104,10 @@ for var in var_list:
 	start_ind = (start_lag.days*24 + start_lag.seconds//3600)/dtime
 	end_lag = plot_end_time - sim_start_time
 	end_ind = (end_lag.days*24 + end_lag.seconds//3600)/dtime
-	var_avg = np.zeros([nversion, 365])
-	count = np.zeros([nversion, 365])
-	for j in range(nversion):
-		var_ind = var_dict[var][0][j]  # index of column of this var in this version
+	var_avg = np.zeros([nopt, 365])
+	count = np.zeros([nopt, 365])
+	for j in range(nopt):
+		var_ind = var_dict[var][0][j]  # index of column of this option
 		if var_ind==-1: # if this var does not exist in this version
 			continue
 		for t in range(start_ind, end_ind+1):
@@ -123,11 +125,11 @@ for var in var_list:
 	fig = plt.figure(figsize=(16,8))
 	ax = plt.axes()
 	color = ['m', 'r', 'g', 'b']
-	for j in range(nversion):
-		var_ind = var_dict[var][0][j]  # index of column of this var in this version
-		if var_ind==-1: # if this var does not exist in this version
+	for j in range(nopt):
+		var_ind = var_dict[var][0][j]  # index of column of this var in this option 
+		if var_ind==-1: # if this var does not exist in this option version
 			continue
-		ax.plot_date(dates_year_example, var_avg[j], color[j], label=version[j])
+		ax.plot_date(dates_year_example, var_avg[j], color[j], label=opt[j])
 	ax.xaxis.set_major_formatter(DateFormatter("%b"))
 	for tick in ax.xaxis.get_major_ticks():
 		tick.label.set_fontsize(16)
@@ -135,39 +137,19 @@ for var in var_list:
 		tick.label.set_fontsize(16)
 	plt.legend(loc=1, prop={'size':16})
 	plt.ylabel('%s (%s)' %(var, var_dict[var][1]), fontsize=16)
-	plt.title('%s, veg%s' %(balance, args.veg), fontsize=20)
-	fig.savefig('%s/ts_dailyAvg_%s_veg%s.png' %(result_dir, var, args.veg), format='png')
-
-	# plot model difference
-	fig = plt.figure(figsize=(16,8))
-	ax = plt.axes()
-	color = ['m', 'r', 'g', 'b']
-	for j in range(nversion-1):
-		var_ind = var_dict[var][0][j]  # index of column of this var in this version
-		var_ind_next = var_dict[var][0][j+1]
-		if var_ind==-1 or var_ind_next==-1: # if this var does not exist in this version
-			continue
-		ax.plot_date(dates_year_example, var_avg[j+1]-var_avg[j], color[j+1], label='%s-%s' %(version[j+1], version[j]))
-	ax.xaxis.set_major_formatter(DateFormatter("%b"))
-	for tick in ax.xaxis.get_major_ticks():
-		tick.label.set_fontsize(16)
-	for tick in ax.yaxis.get_major_ticks():
-		tick.label.set_fontsize(16)
-	plt.legend(loc=1, prop={'size':16})
-	plt.ylabel('%s (%s)' %(var, var_dict[var][1]), fontsize=16)
-	plt.title('%s, veg%s' %(balance, args.veg), fontsize=20)
-	fig.savefig('%s/ts_diff_dailyAvg_%s_veg%s.png' %(result_dir, var, args.veg), format='png')
+	plt.title('%s, %s, %s, veg%s' %(param_name, version_name, balance, args.veg), fontsize=20)
+	fig.savefig('%s/ts_dailyAvg_%s_%s_veg%s.png' %(result_dir, param_name, var, args.veg), format='png')
 
 	# plot accumlated time series
 	if var_dict[var][1]=='mm/hr':  # if flux, plot and change unit to mm (NOTE: first convert to mm/day)
 		fig = plt.figure(figsize=(16,8))
 		ax = plt.axes()
 		color = ['m', 'r', 'g', 'b']
-		for j in range(nversion):
+		for j in range(nopt):
 			var_ind = var_dict[var][0][j]  # index of column of this var in this version
-			if var_ind==-1: # if this var does not exist in this version
+			if var_ind==-1: # if this var does not exist in this option version
 				continue
-			ax.plot_date(dates_year_example, np.cumsum(var_avg[j]*24), color[j], label=version[j])
+			ax.plot_date(dates_year_example, np.cumsum(var_avg[j]*24), color[j], label=opt[j])
 		ax.xaxis.set_major_formatter(DateFormatter("%b"))
 		for tick in ax.xaxis.get_major_ticks():
 			tick.label.set_fontsize(16)
@@ -175,30 +157,7 @@ for var in var_list:
 			tick.label.set_fontsize(16)
 		plt.legend(loc=2, prop={'size':16})
 		plt.ylabel('%s (%s)' %(var, 'mm'), fontsize=16)
-		plt.title('Accumulated, %s, veg%s' %(balance, args.veg), fontsize=20)
-		fig.savefig('%s/ts_accum_dailyAvg_%s_veg%s.png' %(result_dir, var, args.veg), format='png')
-
-		# plot accumulated model difference
-		fig = plt.figure(figsize=(16,8))
-		ax = plt.axes()
-		color = ['m', 'r', 'g', 'b']
-		for j in range(nversion-1):
-			var_ind = var_dict[var][0][j]  # index of column of this var in this version
-			var_ind_next = var_dict[var][0][j+1]
-			if var_ind==-1 or var_ind_next==-1: # if this var does not exist in this version
-				continue
-			ax.plot_date(dates_year_example, np.cumsum((var_avg[j+1]-var_avg[j])*24), color[j+1], label='%s-%s' %(version[j+1], version[j]))
-		ax.xaxis.set_major_formatter(DateFormatter("%b"))
-		for tick in ax.xaxis.get_major_ticks():
-			tick.label.set_fontsize(16)
-		for tick in ax.yaxis.get_major_ticks():
-			tick.label.set_fontsize(16)
-		plt.legend(loc=2, prop={'size':16})
-		plt.ylabel('%s (%s)' %(var, 'mm'), fontsize=16)
-		plt.title('Accumulated, %s, veg%s' %(balance, args.veg), fontsize=20)
-		fig.savefig('%s/ts_diff_accum_dailyAvg_%s_veg%s.png' %(result_dir, var, args.veg), format='png')
-
-
-
+		plt.title('%s, %s, accumulated, %s, veg%s' %(param_name, version_name, balance, args.veg), fontsize=20)
+		fig.savefig('%s/ts_accum_dailyAvg_%s_%s_veg%s.png' %(result_dir, param_name, var, args.veg), format='png')
 
 

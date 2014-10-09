@@ -1,0 +1,85 @@
+#!/bin/bash
+
+veg_type=$1
+
+####################################################################################################
+############################# set common variables for all versions ################################
+####################################################################################################
+#---------common variables for substitution
+NODES=3
+FULL_ENERGY=TRUE
+FROZEN_SOIL=FALSE
+QUICK_FLUX=TRUE
+COMPUTE_TREELINE=FALSE
+AERO_RESIST_CANSNOW=AR_406_FULL
+FORCING1="/raid2/ymao/VIC_versions_snow_comparison/forcing/forcing_48.59375_-120.21875/data_"
+SOIL="/raid2/ymao/VIC_versions_snow_comparison/param_files/param_48.59375_-120.21875/soil_param_48.59375_-120.21875"
+VEGPARAM="/raid2/ymao/VIC_versions_snow_comparison/param_files/param_48.59375_-120.21875/veg_param_48.59375_-120.21875_veg$veg_type"
+VEGLIB="/raid2/ymao/VIC_versions_snow_comparison/param_files/param_48.59375_-120.21875/veglib.LDAS"
+#---------global settings for all versions
+global_file_base_dir="/raid2/ymao/VIC_versions_snow_comparison/global_files"
+result_file_base_dir="/raid2/ymao/VIC_versions_snow_comparison/vic_output"
+running_code=20141003_EB_AR_3 # global files and vic output files of all versions will be put under subdirectories running_code
+
+
+####################################################################################################
+############################# set unique variables for different versions ########################
+####################################################################################################
+
+############################# v4.1.2.m ###############################
+#-------- unique variables for different versions for substitution
+VEGPARAM_LAI_v412=FALSE
+LAI_SRC_v412=LAI_FROM_VEGLIB
+RESULT_DIR_v412="veg_$veg_type/v4.1.2.m/"
+#--------- unique settings
+template_v412="/raid2/ymao/VIC_versions_snow_comparison/global_files/input.v4.1.2.m.template.v2" # template of global file
+global_file_v412="input.v4.1.2.m.veg$veg_type"
+model_v412="/raid2/ymao/VIC_versions_snow_comparison/source_code/VIC-VIC.4.1.2.m/src/vicNl"
+
+
+####################################################################################################
+################### create new global file for each model and substitue variables #################
+####################################################################################################
+#----------- make global file directory
+if [ -d $global_file_base_dir/$running_code ]; then
+	echo "Global file directory exists."
+else
+	mkdir $global_file_base_dir/$running_code
+fi
+
+############################ v4.1.2.m ###########################
+#---------- create new global file; substitute common variables
+cp $template_v412 $global_file_base_dir/$running_code/$global_file_v412
+sed -i s/\<NODES\>/$NODES/g $global_file_base_dir/$running_code/$global_file_v412
+sed -i s/\<FULL_ENERGY\>/$FULL_ENERGY/g $global_file_base_dir/$running_code/$global_file_v412
+sed -i s/\<FROZEN_SOIL\>/$FROZEN_SOIL/g $global_file_base_dir/$running_code/$global_file_v412
+sed -i s/\<QUICK_FLUX\>/$QUICK_FLUX/g $global_file_base_dir/$running_code/$global_file_v412
+sed -i s/\<COMPUTE_TREELINE\>/$COMPUTE_TREELINE/g $global_file_base_dir/$running_code/$global_file_v412
+sed -i s/\<AERO_RESIST_CANSNOW\>/$AERO_RESIST_CANSNOW/g $global_file_base_dir/$running_code/$global_file_v412
+sed -i s/\<FORCING1\>/${FORCING1//\//\\/}/g $global_file_base_dir/$running_code/$global_file_v412
+sed -i s/\<SOIL\>/${SOIL//\//\\/}/g $global_file_base_dir/$running_code/$global_file_v412
+sed -i s/\<VEGPARAM\>/${VEGPARAM//\//\\/}/g $global_file_base_dir/$running_code/$global_file_v412
+sed -i s/\<VEGLIB\>/${VEGLIB//\//\\/}/g $global_file_base_dir/$running_code/$global_file_v412
+#--------- substitute unique variables
+sed -i s/\<VEGPARAM_LAI_v412\>/$VEGPARAM_LAI_v412/g $global_file_base_dir/$running_code/$global_file_v412
+sed -i s/\<LAI_SRC_v412\>/$LAI_SRC_v412/g $global_file_base_dir/$running_code/$global_file_v412
+RESULT_DIR_v412=$result_file_base_dir/$running_code/$RESULT_DIR_v412
+if [ -d $RESULT_DIR_v412 ]; then
+	echo "VIC output directory exists."
+else
+	mkdir -p $RESULT_DIR_v412
+fi
+sed -i s/\<RESULT_DIR\>/${RESULT_DIR_v412//\//\\/}/g $global_file_base_dir/$running_code/$global_file_v412
+
+
+################################################################################
+#################################### run model #################################
+################################################################################
+$model_v412 -g $global_file_base_dir/$running_code/$global_file_v412
+
+
+
+
+
+
+

@@ -4,3 +4,18 @@ control.20140929.src
 
 control.20140930.src
 	Energy balance (NODES=3)
+
+control.20141003_EnergyBalance.src
+	using global file template.v2 (added output variables; output variables different for different versions)
+
+control.20141003_EB_AR_[1-4].src
+	the same as 'control.20141003_EnergyBalance.src', but change AERO_RESIST_CANSNOW option
+
+control.20141003_WaterBalance.src
+	the same as 'control.20141003_EnergyBalance.src', except running for WaterBalance mode, NODE=1
+
+control.20141003_WB_AR_[1-4].src
+	the same as 'control.20141003_EB_AR_[1-4].src', except running for WaterBalance mode, NODE=1
+
+
+

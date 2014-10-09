@@ -1,0 +1,14 @@
+#!/bin/csh
+#
+#$ -cwd
+#$ -j y
+#$ -S /bin/csh
+#$ -q default.q
+
+set vegtype = $1
+
+./control.20141003_WB_AR_1.src $vegtype
+./control.20141003_WB_AR_2.src $vegtype
+./control.20141003_WB_AR_3.src $vegtype
+./control.20141003_WB_AR_4.src $vegtype
+
